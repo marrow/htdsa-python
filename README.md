@@ -1,4 +1,6 @@
-# HTTP Digital Signature Algorithm, Draft 201518a
+# HTTP Digital Signature Algorithm
+
+> Draft 2015-18-A
 
 A light-weight digital signature algorithm for cryptographic verification of HTTP requests and responses, secured RPC, and SSO.
 
