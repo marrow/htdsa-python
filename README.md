@@ -1,6 +1,6 @@
 # HTTP Digital Signature Algorithm
 
-> Draft 2015-18-A
+> Draft 2015-18-B
 
 A light-weight digital signature algorithm for cryptographic verification of HTTP requests and responses, secured RPC, and SSO.
 
@@ -38,9 +38,10 @@ An application is any third-party software which wishes to issue RPC/API calls a
    3. Share the public key with the server out-of-band, generally through a web interface.
 2. On each request:
    1. Perform request canonicalization by combining (using UNIX newlines) the following:
-      1. The request's @Date@ header.  The request will be rejected outright by the server if the @Date@ header is out-of-bounds by more than 30 seconds using an atomic-synchronized (NTP) clock.
-      2. The request URI, e.g.: `https://example.com/api/endpoint`
-      3. The HTTP request body.
+      1. The request's HTTP method, upper-case, e.g.: `GET`
+      2. The request's `Date` header.  The request will be rejected outright by the server if the `Date` header is out-of-bounds by more than 30 seconds using an atomic-synchronized (NTP) clock.
+      3. The request URI, e.g.: `https://example.com/api/endpoint`
+      4. The HTTP request body.
    2. Submit the HTTP request with two additional HTTP headers:
       1. `X-Service` — the unique identifier assigned to your application when exchanging keys.
       2. `X-Signature` — the result of digitally signing the aforementioned canonicalized data.  May, depending on client and server capabilities, be sent as a chunked transfer HTTP header trailer.  The signature should be hex encoded.
@@ -58,17 +59,18 @@ A server is any software service which wishes to respond to RPC/API calls from a
    2. Use the SHA-256 hashing algorithm.
    3. Share the public key of this pair with the client out-of-band, generally through a web interface.
 3. Before processing the request:
-   1. Ensure the @X-Service@ and @X-Signature@ keys are present.
-   2. Validate the @X-Signature@ against the canonical data as defined in the application section.
+   1. Ensure the `X-Service` and `X-Signature` keys are present.
+   2. Validate the `X-Signature` against the canonical data as defined in the application section.
 4. After processing the request:
    1. Ensure the returned data is either empty or valid JSON data.
    2. Canonicalize the response by combining (using UNIX newlines) the following:
-      1. The requesting service ID, from the @X-Service@ header.
-      2. The response's @Date@ header.
-      3. The request's endpoint URI.
-      4. The response body.
-   3. Add an @X-Signature@ header that is the result of signing the canonical data using the application-specific server key.
-5. Discard requests which fail validation by returning a @400 Bad Request@ status code with explanation string in the body.
+      1. The requesting service ID, from the `X-Service` header.
+      2. The HTTP method of the request, upper-case.
+      3. The response's `Date` header.
+      4. The request's endpoint URI.
+      5. The response body.
+   3. Add an `X-Signature` header that is the result of signing the canonical data using the application-specific server key.
+5. Discard requests which fail validation by returning a `400 Bad Request` status code with explanation string in the body.
 
 
 ## Implementations
@@ -80,5 +82,5 @@ Additional implementations may be available.
 
 ##  Old Links
 
-* "Semi-RFC for header/body signatures of HTTP requests.":https://gist.github.com/amcgregor/db76655c47b5f550dee0
-* "Example implementation in Python.":https://gist.github.com/amcgregor/12d79d2cfb039275b337
+* [Semi-RFC for header/body signatures of HTTP requests.](https://gist.github.com/amcgregor/db76655c47b5f550dee0)
+* [Example implementation in Python.](https://gist.github.com/amcgregor/12d79d2cfb039275b337)
