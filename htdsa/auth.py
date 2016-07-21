@@ -12,6 +12,7 @@ from requests.auth import AuthBase
 # Protocol-Mandated Imports
 from binascii import hexlify, unhexlify
 from hashlib import sha256
+from ecdsa import SigningKey, VerifyingKey
 from ecdsa.keys import BadSignatureError
 
 
@@ -34,12 +35,19 @@ class SignedAuth(AuthBase):
 	def __init__(self, identity, private, public):
 		"""Configure HTDSA signed request/response authentication.
 		
-		To perform the cryptographic operations required for the HTDSA protocol you must pass in either
+		To perform the cryptographic operations required for the HTDSA protocol you must pass in either instances of
+		`ecdsa` signing and verifying keys, or their hex-encoded versions which will be converted automatically.
+		
+		Additionally, the identity token (opaque identifier) assigned to your client application by the provider will
+		need to be passed in so we can identify ourselves.
+		
+		The private key is your application's private key. The public key is the provider's service key you were given
+		when registering your application.
 		"""
 		
 		self.identity = identity
-		self.private = private
-		self.public = public
+		self.private = SigningKey.from_string(private) if isinstance(private, (str, unicode)) else private
+		self.public = VerifyingKey.from_string(public) if isinstance(public, (str, unicode)) else public
 	
 	def __call__(self, request):
 		if __debug__:
