@@ -46,8 +46,8 @@ class SignedAuth(AuthBase):
 		"""
 		
 		self.identity = identity
-		self.private = SigningKey.from_string(private) if isinstance(private, (str, unicode)) else private
-		self.public = VerifyingKey.from_string(public) if isinstance(public, (str, unicode)) else public
+		self.private = SigningKey.from_string(unhexlify(private)) if isinstance(private, (str, unicode)) else private
+		self.public = VerifyingKey.from_string(unhexlify(public)) if isinstance(public, (str, unicode)) else public
 	
 	def __call__(self, request):
 		if __debug__:
