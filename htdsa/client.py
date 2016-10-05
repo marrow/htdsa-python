@@ -58,8 +58,8 @@ class API(object):
 		
 		return uri
 	
-	def _request(self, method, args, kwargs):
-		result = self.pool.request(method, self._uri(args), data=kwargs, **self.options)
+	def _request(self, method, args, kwargs, params=None):
+		result = self.pool.request(method, self._uri(args), params=params, data=kwargs, **self.options)
 		
 		if not result.status_code == requests.codes.ok:
 			return None
@@ -76,7 +76,7 @@ class API(object):
 		return (i.strip() for i in result.headers['Allow'].split(','))
 	
 	def get(self, *args, **kwargs):
-		return self._request('GET', args, kwargs)
+		return self._request('GET', args, None, kwargs)
 	
 	def head(self, *args, **kwargs):
 		result = self.pool.request('HEAD', self._uri(args), data=kwargs, **self.options)
