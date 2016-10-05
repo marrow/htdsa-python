@@ -58,13 +58,13 @@ class API(object):
 		
 		return uri
 	
-	def _request(self, method, args, kwargs, params=None):
+	def _request(self, method, args, kwargs, params=None, json=True):
 		result = self.pool.request(method, self._uri(args), params=params, data=kwargs, **self.options)
 		
 		if not result.status_code == requests.codes.ok:
 			return None
 		
-		return result.json(**self.json)
+		return result.json(**self.json) if json else result
 	
 	@property
 	def _allowed(self):
@@ -79,12 +79,7 @@ class API(object):
 		return self._request('GET', args, None, kwargs)
 	
 	def head(self, *args, **kwargs):
-		result = self.pool.request('HEAD', self._uri(args), data=kwargs, **self.options)
-		
-		if not result.status_code == requests.codes.ok:
-			return None
-		
-		return result
+		return self._request('HEAD', args, None, kwargs, False)
 	
 	def post(self, *args, **kwargs):
 		return self._request('POST', args, kwargs)
@@ -93,7 +88,7 @@ class API(object):
 		return self._request('POST', args, kwargs)
 	
 	def delete(self, *args, **kwargs):
-		return self._request('DELETE', args, kwargs)
+		return self._request('DELETE', args, None, kwargs)
 	
 	def patch(self, *args, **kwargs):
 		return self._request('PATCH', args, kwargs)
