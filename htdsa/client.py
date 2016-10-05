@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import urllib
 import requests
 
 
@@ -59,7 +60,15 @@ class API(object):
 		return uri
 	
 	def _request(self, method, args, kwargs):
-		result = self.pool.request(method, self._uri(args), data=kwargs, **self.options)
+		uri = self._uri(args)
+		data = kwargs
+		if method == 'GET' and len(kwargs) > 0:
+			data = dict()
+			qs = urllib.parse.urlencode(kwargs)
+			uri += '?' if '?' not in uri else '&'
+			uri += qs
+
+		result = self.pool.request(method, uri, data=data, **self.options)
 		
 		if not result.status_code == requests.codes.ok:
 			return None
