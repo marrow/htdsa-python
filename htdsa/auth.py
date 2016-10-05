@@ -12,7 +12,7 @@ from requests.auth import AuthBase
 # Protocol-Mandated Imports
 from binascii import hexlify, unhexlify
 from hashlib import sha256
-from ecdsa import SigningKey, VerifyingKey
+from ecdsa import SigningKey, VerifyingKey, NIST256p
 from ecdsa.keys import BadSignatureError
 
 
@@ -46,8 +46,8 @@ class SignedAuth(AuthBase):
 		"""
 		
 		self.identity = identity
-		self.private = SigningKey.from_string(unhexlify(private)) if isinstance(private, (str, unicode)) else private
-		self.public = VerifyingKey.from_string(unhexlify(public)) if isinstance(public, (str, unicode)) else public
+		self.private = SigningKey.from_string(unhexlify(private), NIST256p) if isinstance(private, (str, unicode)) else private
+		self.public = VerifyingKey.from_string(unhexlify(public), NIST256p) if isinstance(public, (str, unicode)) else public
 	
 	def __call__(self, request):
 		if __debug__:
@@ -63,7 +63,7 @@ class SignedAuth(AuthBase):
 		
 		canon = self.CANONICAL_REQUEST_STRUCTURE.format(method=request.method, r=request).encode('utf-8')
 		
-		request.headers['X-Signature'] = hexlify(self.private.sign(canon))  # Ref: Application 2.ii.b.
+		request.headers['X-Signature'] = hexlify(self.private.sign(canon, hashfunc=sha256))  # Ref: Application 2.ii.b.
 		
 		if __debug__:
 			duration = time.time() - start
