@@ -58,6 +58,7 @@ setup(
 						'pytest-cov',
 						'pytest-spec',
 						'pytest-flakes',
+						'pre-commit',
 					],
 				client = [
 						'requests',
