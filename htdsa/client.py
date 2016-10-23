@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+"""An extremely simple (yet powerful) generic REST interface utilizing HTDSA signing."""
+
 from __future__ import unicode_literals
 
 import requests
@@ -20,6 +22,21 @@ from .auth import SignedAuth
 
 
 class API(object):
+	"""An API endpoint proxy object and factory for other API endpoints.
+	
+	Attributes (other than the methods defined at the class level) and array subscripts result in a new API instance
+	with the requested attribute (or subscript) appended as a path element. Additionally, positional arguments are
+	appended as path elements to the API endpoint URL. Keyword arguments, on applicable HTTP methods, are passed
+	through as Requests' `data` argument. (Currently; the option to use JSON request bodies will come in a future
+	revision.)
+	
+	All of the above results in an API making requests like:
+	
+	* `api.sso.grant.get()` -> `.../sso/grant`
+	* `api.account['amcgregor'].get()` -> `.../account/amcgregor`
+	* `api.company.get('Google')` -> `.../company/Google`
+	"""
+	
 	__slots__ = ('endpoint', 'identity', 'private', 'public', 'pool', 'options', 'json')
 	
 	def __init__(self, endpoint, identity, private, public, options=None, json=None, pool=None):

@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+"""An authentication plugin to bring HTDSA support to Requests."""
+
 from __future__ import unicode_literals
 
 if __debug__:
@@ -28,6 +30,13 @@ except:
 
 
 class SignedAuth(AuthBase):
+	"""HTDSA signed authentication handler for Requests.
+	
+	Pass an instance as the `auth` keyword argument to the many entry points to the Requests library, such as::
+		
+		requests.get("http://example.com", auth=SignedAuth(...))
+	"""
+	
 	CANONICAL_REQUEST_STRUCTURE = "{r.method}\n{r.headers[date]}\n{r.url}\n{r.body}"  # Ref: Application 2.i.
 	CANONICAL_RESPONSE_STRUCTURE = "{identity}\n{r.request.method}\n{date}\n" \
 			"{r.request.url}\n{r.text}"  # Ref: Server 4.ii.
